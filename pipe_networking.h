@@ -31,8 +31,15 @@ int server_connect(int from_client);
 //for forking server
 int server_setup();
 
+// for error handling
+int err();
+
+// for generating random numbers
+int random_random(); 
+int random_urandom(); 
+
 //multi_server
-int multi_server_setup();
-int multi_server_connect(int from_client, struct message m);
+// int multi_server_setup();
+// int multi_server_connect(int from_client, struct message m);
 
 #endif
