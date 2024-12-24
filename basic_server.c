@@ -6,5 +6,5 @@ int main() {
 
   from_client = server_handshake( &to_client );
 
-  printf("Connection established on the server side");
+  printf("Connection established on the server side\n");
 }

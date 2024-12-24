@@ -49,20 +49,19 @@ int server_handshake(int *to_client) {
   printf("(SERVER) Setting up server \n");
   int from_client = server_setup();
 
-  char *fifo_name_buff[PIPE_SIZING];
-  if (read(from_client, fifo_name_buff, sizeof(fifo_name_buff)) == -1) err();
-  printf("(SERVER) Read from the WKP, got fifo name %s \n", fifo_name_buff);
-
-  *to_client = open(fifo_name_buff, O_WRONLY, 0666);
+  *to_client = server_connect(from_client);
 
   int random_number = random_random();
   if (write(*to_client, &random_number, sizeof(random_number)) == -1) err();
-  printf("(SEVER) Created random number %d and sent it to client\n", random_number);
+  printf("(SEVER) Created random number %d and sent it to client\n",
+         random_number);
 
-  int return_number = NULL;
+  int return_number = -1;
   if (read(from_client, &return_number, sizeof(return_number)) == -1) err();
-  printf("(SERVER) Got return number %d, which is hopefully iterated from %d\n", return_number, random_number);
+  printf("(SERVER) Got return number %d, which is hopefully iterated from %d\n",
+         return_number, random_number);
 
+  *to_client = server_connect(from_client);
   //   got from client();
   //   get the file descriptor for the client private pipe
   //   then set the from client to the server's pipe
@@ -88,8 +87,7 @@ int client_handshake(int *to_server) {
   // gets the and then returns file descriptor of the upstream pipe? creates it,
   // or does it get from another function
 
-  printf("(CLIENT): Creating fifo with name %s. \n", fifo_name);
-
+  printf("(CLIENT): Creating fifo");
   char fifo_name[PIPE_SIZING];
   sprintf(fifo_name, "%d", getpid());
   char *fifo_ending = ".fifo";
@@ -101,7 +99,7 @@ int client_handshake(int *to_server) {
       getpid());
 
   *to_server = open(WKP, O_WRONLY, 0666);
-  if (write(to_server, fifo_name, strlen(fifo_name)) == -1) err();
+  if (write(*to_server, fifo_name, strlen(fifo_name)) == -1) err();
 
   printf("(CLIENT): Reading from private pipe to get the int\n");
   int pipe_buff;
@@ -115,9 +113,9 @@ int client_handshake(int *to_server) {
   pipe_buff++;
 
   printf("(CLIENT) iterated the number, now sending it to the public pipe\n");
-  if (write(to_server, &pipe_buff, sizeof(pipe_buff)) == -1) err();
+  if (write(*to_server, &pipe_buff, sizeof(pipe_buff)) == -1) err();
 
-  printf("(CLIENT) sent the number");
+  printf("(CLIENT) sent the number\n");
 
   return from_server;
 }
@@ -131,10 +129,10 @@ int client_handshake(int *to_server) {
   returns the file descriptor for the downstream pipe.
   =========================*/
 int server_connect(int from_client) {
-  remove(WKP);
-  mkfifo(WKP, 0666);
-  int to_client = open(WKP, O_RDONLY, 0666);
-  //   hands of the pipe to a client pipe
+  char fifo_name_buff[PIPE_SIZING];
+  if (read(from_client, fifo_name_buff, sizeof(fifo_name_buff)) == -1) err();
+  printf("(SERVER) Read from the WKP, got fifo name %s \n", fifo_name_buff);
+  int to_client = open(fifo_name_buff, O_WRONLY, 0666);
   return to_client;
 }
 
