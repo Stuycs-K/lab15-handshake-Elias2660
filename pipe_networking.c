@@ -29,7 +29,7 @@ int server_setup() {
   printf(
       "(SERVER SETUP) Created the client pipe in the server setup function\n");
   int from_client = open(
-      WKP, O_RDONLY, 0666);  // server is only reading messages from the client
+      WKP, O_RDONLY, 0644);  // server is only reading messages from the client
   remove(WKP);
   return from_client;
 }
@@ -87,7 +87,7 @@ int client_handshake(int *to_server) {
   // gets the and then returns file descriptor of the upstream pipe? creates it,
   // or does it get from another function
 
-  printf("(CLIENT): Creating fifo");
+  printf("(CLIENT): Creating fifo\n");
   char fifo_name[PIPE_SIZING];
   sprintf(fifo_name, "%d", getpid());
   char *fifo_ending = ".fifo";
@@ -95,20 +95,23 @@ int client_handshake(int *to_server) {
   if (mkfifo(fifo_name, 0666) == -1) err();
 
   printf(
-      "(CLIENT): Sending the number %d.fifo (the pipe_name) to the parent pipe",
+      "(CLIENT): Sending the number %d.fifo (the pipe_name) to the parent pipe\n",
       getpid());
 
-  *to_server = open(WKP, O_WRONLY, 0666);
+  *to_server = open(WKP, O_WRONLY, 0644);
   if (write(*to_server, fifo_name, strlen(fifo_name)) == -1) err();
 
   printf("(CLIENT): Reading from private pipe to get the int\n");
   int pipe_buff;
-  int from_server = open(fifo_name, O_RDONLY, 0666);
+  int from_server = open(fifo_name, O_RDONLY, 0644);
   if (from_server == -1) err();
 
   // attempt to read random number from parent pipe
   if (read(from_server, &pipe_buff, sizeof(pipe_buff)) == -1) err();
   printf("(CLIENT) Read the random int, got %d\n", pipe_buff);
+
+  //   removing the client pipe
+  if (remove(fifo_name) == -1) err();
 
   pipe_buff++;
 
@@ -132,7 +135,7 @@ int server_connect(int from_client) {
   char fifo_name_buff[PIPE_SIZING];
   if (read(from_client, fifo_name_buff, sizeof(fifo_name_buff)) == -1) err();
   printf("(SERVER) Read from the WKP, got fifo name %s \n", fifo_name_buff);
-  int to_client = open(fifo_name_buff, O_WRONLY, 0666);
+  int to_client = open(fifo_name_buff, O_WRONLY, 0644);
   return to_client;
 }
 
