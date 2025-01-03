@@ -11,6 +11,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "colors.h"
+
 #define PIPE_SIZING 2048
 
 // UPSTREAM = to the server / from the client
@@ -26,10 +28,10 @@
 int server_setup() {
   if (mkfifo(WKP, 0666) == -1) err();
 
-  printf(
-      "(SERVER SETUP) Created the client pipe in the server setup function\n");
+  printf("(" HMAG "SERVER SETUP" reset
+         ") Created the client pipe in the server setup function\n");
   int from_client = open(
-      WKP, O_RDONLY, 0644);  // server is only reading messages from the client
+      WKP, O_RDONLY, 0666);  // server is only reading messages from the client
   remove(WKP);
   return from_client;
 }
@@ -46,22 +48,21 @@ int server_setup() {
   =========================*/
 int server_handshake(int *to_client) {
   //   set up the private pipe here
-  printf("(SERVER) Setting up server \n");
+  printf("(" HMAG "SERVER" reset ") Setting up server \n");
   int from_client = server_setup();
-
   *to_client = server_connect(from_client);
 
   int random_number = random_random();
   if (write(*to_client, &random_number, sizeof(random_number)) == -1) err();
-  printf("(SEVER) Created random number %d and sent it to client\n",
+  printf("(" HMAG "SERVER" reset
+         ") Created random number %d and sent it to client\n",
          random_number);
 
   int return_number = -1;
   if (read(from_client, &return_number, sizeof(return_number)) == -1) err();
-  printf("(SERVER) Got return number %d, which is hopefully iterated from %d\n",
+  printf("(" HMAG "SERVER" reset
+         ") Got return number %d, which is hopefully iterated from %d\n",
          return_number, random_number);
-
-  *to_client = server_connect(from_client);
   //   got from client();
   //   get the file descriptor for the client private pipe
   //   then set the from client to the server's pipe
@@ -87,38 +88,45 @@ int client_handshake(int *to_server) {
   // gets the and then returns file descriptor of the upstream pipe? creates it,
   // or does it get from another function
 
-  printf("(CLIENT): Creating fifo\n");
+  printf("(" HCYN "CLIENT" reset "): Creating fifo\n");
   char fifo_name[PIPE_SIZING];
   sprintf(fifo_name, "%d", getpid());
   char *fifo_ending = ".fifo";
   strcat(fifo_name, fifo_ending);
   if (mkfifo(fifo_name, 0666) == -1) err();
 
-  printf(
-      "(CLIENT): Sending the number %d.fifo (the pipe_name) to the parent pipe\n",
-      getpid());
+  printf("(" HCYN "CLIENT" reset
+         "): Sending the number %d.fifo (the pipe_name) to the parent "
+         "pipe\n",
+         getpid());
 
-  *to_server = open(WKP, O_WRONLY, 0644);
+  *to_server = -1;
+  while (*to_server == -1) {
+    *to_server = open(WKP, O_WRONLY, 0666);
+  }
+
   if (write(*to_server, fifo_name, strlen(fifo_name)) == -1) err();
 
-  printf("(CLIENT): Reading from private pipe to get the int\n");
+  printf("(" HCYN "CLIENT" reset
+         "): Reading from private pipe to get the int\n");
   int pipe_buff;
-  int from_server = open(fifo_name, O_RDONLY, 0644);
+  int from_server = open(fifo_name, O_RDONLY, 0666);
   if (from_server == -1) err();
 
   // attempt to read random number from parent pipe
   if (read(from_server, &pipe_buff, sizeof(pipe_buff)) == -1) err();
-  printf("(CLIENT) Read the random int, got %d\n", pipe_buff);
+  printf("(" HCYN "CLIENT" reset "): Read the random int, got %d\n", pipe_buff);
 
   //   removing the client pipe
   if (remove(fifo_name) == -1) err();
 
   pipe_buff++;
 
-  printf("(CLIENT) iterated the number, now sending it to the public pipe\n");
+  printf("(" HCYN "CLIENT" reset
+         "): iterated the number, now sending it to the public pipe\n");
   if (write(*to_server, &pipe_buff, sizeof(pipe_buff)) == -1) err();
 
-  printf("(CLIENT) sent the number\n");
+  printf("(" HCYN "CLIENT" reset "): sent the number\n");
 
   return from_server;
 }
@@ -134,8 +142,9 @@ int client_handshake(int *to_server) {
 int server_connect(int from_client) {
   char fifo_name_buff[PIPE_SIZING];
   if (read(from_client, fifo_name_buff, sizeof(fifo_name_buff)) == -1) err();
-  printf("(SERVER) Read from the WKP, got fifo name %s \n", fifo_name_buff);
-  int to_client = open(fifo_name_buff, O_WRONLY, 0644);
+  printf("(" HMAG "SERVER" reset ") Read from the WKP, got fifo name %s \n",
+         fifo_name_buff);
+  int to_client = open(fifo_name_buff, O_WRONLY, 0666);
   return to_client;
 }
 
