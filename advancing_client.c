@@ -23,7 +23,7 @@ int main() {
     }
     if (randomized_number == -1) {
       printf("(" HCYN "CLIENT" reset
-             "): Detected pipe closure by server; closing down\n");
+             "): Detected pipe "HRED"CLOSURE"reset" by server; closing down\n");
       close(to_server);
       close(from_server);
       exit(0);

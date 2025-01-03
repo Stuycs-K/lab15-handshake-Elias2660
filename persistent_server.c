@@ -4,11 +4,11 @@
 int to_client, from_client;
 
 void handle_sigpipe(int sig) {
-  printf("(" HMAG "SERVER" reset "): Caught SIGPIPE, client disconnected\n");
+  printf("(" HRED "SERVER" reset "): Caught SIGPIPE, a client disconnected\n");
 }
 
 void handle_sigint(int sig) {
-  printf("(" HMAG "SERVER" reset "): Closing\n");
+  printf("(" HRED "SERVER" reset "): Closing\n");
   int close_num = -1;
   if (write(to_client, &close_num, sizeof(close_num)) != -1) {
     // in case clients still connected
