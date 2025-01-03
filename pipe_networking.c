@@ -32,6 +32,7 @@ int server_setup() {
          ") Created the client pipe in the server setup function\n");
   int from_client = open(
       WKP, O_RDONLY, 0666);  // server is only reading messages from the client
+  if (from_client == -1) err();
   remove(WKP);
   return from_client;
 }
@@ -123,7 +124,7 @@ int client_handshake(int *to_server) {
   pipe_buff++;
 
   printf("(" HCYN "CLIENT" reset
-         "):  Iterated the number, now sending it to the public pipe\n");
+         "): Iterated the number, now sending it to the public pipe\n");
   if (write(*to_server, &pipe_buff, sizeof(pipe_buff)) == -1) err();
 
   printf("(" HCYN "CLIENT" reset "): Sent the number\n");

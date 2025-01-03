@@ -21,7 +21,7 @@ void handle_sigint(int sig) {
 }
 
 int main() {
-  signal(SIGPIPE, handle_sigpipe);  // Set up signal handler for SIGPIPE
+  signal(SIGPIPE, handle_sigpipe); // ?????
   signal(SIGINT, handle_sigint);
   while (1) {
     from_client = server_handshake(&to_client);  // initial handshake

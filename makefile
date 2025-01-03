@@ -5,7 +5,7 @@ compile serv cli: forking_server.o advancing_client.o pipe_networking.o colors.h
 server: serv
 	@./serv
 
-client: 
+client: cli
 	@./cli
 
 advancing_client.o: advancing_client.c pipe_networking.h colors.h
