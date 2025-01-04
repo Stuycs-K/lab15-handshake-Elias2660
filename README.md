@@ -1,1 +1,1 @@
-#Server Handshake Example
+# Server Handshake Example in C
