@@ -1,5 +1,6 @@
 #include "colors.h"
 #include "pipe_networking.h"
+#include <signal.h>
 
 int to_server, from_server;
 

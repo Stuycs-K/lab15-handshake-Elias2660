@@ -1,6 +1,6 @@
 #include "colors.h"
 #include "pipe_networking.h"
-
+#include <signal.h>
 int to_client, from_client;
 
 pid_t a = -1;
