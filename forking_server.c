@@ -1,6 +1,7 @@
+#include <signal.h>
+
 #include "colors.h"
 #include "pipe_networking.h"
-#include <signal.h>
 int to_client, from_client;
 
 pid_t a = -1;
@@ -10,9 +11,10 @@ void handle_sigpipe(int sig) {
 }
 
 void handle_sigint(int sig) {
+  if (remove(WKP) != 0) err();
   if (a != 0) {
-    if (remove(WKP) != 0) err();
-    printf("(" HRED "SERVER" reset "): Closing down server due to "HRED"SIGINT"reset"\n");
+    printf("(" HRED "SERVER" reset "): Closing down server due to " HRED
+           "SIGINT" reset "\n");
     close(from_client);
     exit(0);
   } else {
@@ -40,8 +42,8 @@ int main() {
       while (1) {
         int random_int = abs(random_urandom() % 100);
         if (write(to_client, &random_int, sizeof(random_int)) == -1) {
-          printf("(" HYEL "CHILD SERVER" reset
-                 "): Client "HRED"DISCONNECT"reset" or other error\n");
+          printf("(" HYEL "CHILD SERVER" reset "): Client " HRED
+                 "DISCONNECT" reset " or other error\n");
           close(to_client);
           exit(0);
         }
