@@ -11,8 +11,8 @@ void handle_sigpipe(int sig) {
 
 void handle_sigint(int sig) {
   if (a != 0) {
+    if (remove(WKP) != 0) err();
     printf("(" HRED "SERVER" reset "): Closing down server due to "HRED"SIGINT"reset"\n");
-    remove(WKP);
     close(from_client);
     exit(0);
   } else {

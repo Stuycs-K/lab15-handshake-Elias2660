@@ -15,7 +15,6 @@ void handle_sigint(int sig) {
     // in case clients still connected
     close(to_client);
   };
-
   close(from_client);
   remove(WKP);
   exit(0);
