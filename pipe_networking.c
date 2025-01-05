@@ -107,7 +107,7 @@ int client_handshake(int *to_server) {
     *to_server = open(WKP, O_WRONLY, 0666);
   }
 
-  if (write(*to_server, fifo_name, strlen(fifo_name) - 1) == -1) err();
+  if (write(*to_server, fifo_name, strlen(fifo_name)) == -1) err();
 
   printf("(" HCYN "CLIENT" reset
          "): Reading from private pipe to get the int\n");
