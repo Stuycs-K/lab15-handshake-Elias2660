@@ -91,7 +91,7 @@ int client_handshake(int *to_server) {
   // or does it get from another function
 
   printf("(" HCYN "CLIENT" reset "): Creating fifo\n");
-  char fifo_name[PIPE_SIZING];
+  char fifo_name[PIPE_SIZING] = {"\0"};
   sprintf(fifo_name, "%d", getpid());
   char *fifo_ending = ".fifo";
   strcat(fifo_name, fifo_ending);
@@ -142,7 +142,7 @@ int client_handshake(int *to_server) {
   returns the file descriptor for the downstream pipe.
   =========================*/
 int server_connect(int from_client) {
-  char fifo_name_buff[PIPE_SIZING];
+  char fifo_name_buff[PIPE_SIZING] = {"\0"};
   if (read(from_client, fifo_name_buff, sizeof(fifo_name_buff)) == -1) err();
   printf("(" HMAG "SERVER" reset ") Read from the WKP, got fifo name %s \n",
          fifo_name_buff);
