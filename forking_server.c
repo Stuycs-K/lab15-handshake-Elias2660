@@ -11,19 +11,18 @@ void handle_sigpipe(int sig) {
 }
 
 void handle_sigint(int sig) {
-  if (remove(WKP) != 0) err();
+  if (unlink(WKP) != 0) err();
   if (a != 0) {
     printf("(" HRED "SERVER" reset "): Closing down server due to " HRED
            "SIGINT" reset "\n");
     close(from_client);
-    exit(0);
   } else {
     printf("(" HRED "SERVER" reset "): Closing child processes\n");
     int close_num = -1;
     if (write(to_client, &close_num, sizeof(close_num)) == -1) err();
     close(to_client);
-    exit(0);
   }
+  exit(0);
 }
 
 int main() {
