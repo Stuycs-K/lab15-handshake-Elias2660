@@ -27,6 +27,7 @@ void handle_sigint(int sig) {
 
 int main() {
   signal(SIGPIPE, handle_sigpipe);  // Set up signal handler for SIGPIPE
+  signal(SIGINT, handle_sigint);
   while (1) {
     if (a != 0) {
       from_client = server_handshake(&to_client);  // initial handshake
@@ -36,7 +37,6 @@ int main() {
     }
 
     if (a == 0) {
-      signal(SIGINT, handle_sigint);
       printf("(" HYEL "CHILD SERVER" reset "): Handed off to child\n");
       while (1) {
         int random_int = abs(random_urandom() % 100);
