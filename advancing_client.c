@@ -7,6 +7,7 @@ int to_server, from_server;
 void handle_sigint(int sig) {
     close(to_server);
     close(from_server);
+    // ??? remove fifo is disconnected? idk
     exit(0);
 }
 
