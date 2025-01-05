@@ -1,14 +1,21 @@
+#include <signal.h>
+
 #include "colors.h"
 #include "pipe_networking.h"
-#include <signal.h>
 
 int to_server, from_server;
 
 void handle_sigint(int sig) {
-    close(to_server);
-    close(from_server);
-    // ??? remove fifo is disconnected? idk
-    exit(0);
+  close(to_server);
+  close(from_server);
+  // ??? remove fifo is disconnected? idk
+  char fifo_name[PIPE_SIZING] = {"\0"};
+  sprintf(fifo_name, "%d", getpid());
+  char *fifo_ending = ".fifo";
+  strcat(fifo_name, fifo_ending);
+  unlink(fifo_name);
+
+  exit(0);
 }
 
 int main() {
@@ -24,8 +31,8 @@ int main() {
       err();
     }
     if (randomized_number == -1) {
-      printf("(" HCYN "CLIENT" reset
-             "): Detected pipe "HRED"CLOSURE"reset" by server; closing down\n");
+      printf("(" HCYN "CLIENT" reset "): Detected pipe " HRED "CLOSURE" reset
+             " by server; closing down\n");
       close(to_server);
       close(from_server);
       exit(0);

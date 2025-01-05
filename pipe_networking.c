@@ -14,7 +14,6 @@
 
 #include "colors.h"
 
-#define PIPE_SIZING 2048
 
 // UPSTREAM = to the server / from the client
 // DOWNSTREAM = to the client / from the server
